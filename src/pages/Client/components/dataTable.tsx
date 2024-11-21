@@ -1,16 +1,16 @@
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable
+  SortingState,
+  useReactTable,
+  VisibilityState
 } from '@tanstack/react-table'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Button } from 'src/components/ui/button'
 import { Dialog, DialogTrigger } from 'src/components/ui/dialog'
 import {
@@ -21,7 +21,8 @@ import {
 } from 'src/components/ui/dropdown-menu'
 import { Input } from 'src/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'src/components/ui/table'
-import DialogContentUser from './dialogContentUser'
+import DialogContentClient from './dialogContentClient'
+import { AppContext } from 'src/contexts/app.context'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -32,6 +33,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  const { profile } = useContext(AppContext)
+  const isAdmin = profile?.roles.includes('admin')
 
   const table = useReactTable({
     data,
@@ -54,17 +58,19 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     <div>
       <div className='flex items-center justify-between py-4'>
         <Input
-          placeholder='Filter fullname...'
-          value={(table.getColumn('fullname')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('fullname')?.setFilterValue(event.target.value)}
+          placeholder='Filter name...'
+          value={(table.getColumn('client_name')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('client_name')?.setFilterValue(event.target.value)}
           className='max-w-sm'
         />
         <div className='flex items-center justify-center gap-2'>
           <Dialog>
-            <DialogTrigger asChild>
-              <Button variant='outline'>Add user</Button>
-            </DialogTrigger>
-            <DialogContentUser dialogTitle='Add user' dialogBtnTitle='Add' actionType='create'></DialogContentUser>
+            <DialogTrigger asChild>{isAdmin && <Button variant='outline'>Add client</Button>}</DialogTrigger>
+            <DialogContentClient
+              dialogTitle='Add client'
+              dialogBtnTitle='Add'
+              actionType='create'
+            ></DialogContentClient>
           </Dialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

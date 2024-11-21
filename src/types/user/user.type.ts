@@ -1,8 +1,6 @@
 export interface User {
-  _id: string
-  fullname: string
-  gender: string
-  university: string
-  created_at: string
-  updated_at: string
+  user_id: string
+  password: string
+  username: string
+  roles: Array<string>
 }
